@@ -317,7 +317,7 @@ $(function() {
 
 	function updateCondensedText(condensed, type) {
 		var obj = {};
-		var types = ["part", "join", "mode", "kick", "nick"];
+		var types = ["part", "quit", "join", "mode", "kick", "nick"];
 
 		for (var i in types) {
 			var msgType = types[i];
@@ -334,7 +334,11 @@ $(function() {
 			var messageType = types[j];
 			if (obj[messageType]) {
 				text += text === "" ? "" : ", ";
-				text += obj[messageType] + " " + messageType + (obj[messageType] > 1 ? "s" : "");
+				text += obj[messageType] + " " + messageType;
+				if (messageType === "nick" || messageType === "mode") {
+					text += " change";
+				}
+				text += obj[messageType] > 1 ? "s" : "";
 			}
 		}
 		$(condensed.children(".text")[0]).text(text);
