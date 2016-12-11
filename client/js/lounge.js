@@ -940,6 +940,13 @@ $(function() {
 		})
 		.textcomplete([emojiStrategy, nicksStrategy], {
 			placement: "top"
+		}).on({
+			"textComplete:show": function() {
+				$(this).data("autocompleting", true);
+			},
+			"textComplete:hide": function() {
+				$(this).data("autocompleting", false);
+			}
 		});
 
 	var focus = $.noop;
