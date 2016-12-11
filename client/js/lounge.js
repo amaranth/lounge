@@ -95,6 +95,43 @@ $(function() {
 
 	var favicon = $("#favicon");
 
+	var emoji = new window.EmojiConvertor();
+	emoji.replace_mode = "unified";
+	emoji.replace_colons("");  // this is needed to create the colons map
+	var emojies = Object.keys(emoji.map.colons);
+
+	var emojiStrategy = { // emoji strategy
+		id: "emoji",
+		match: /\B:([-+\w]*)$/,
+		search: function(term, callback) {
+			callback($.map(emojies, function(e) {
+				return e.indexOf(term) === 0 ? e : null;
+			}));
+		},
+		template: function(value) {
+			return emoji.replace_colons(":" + value + ":") + " " + value;
+		},
+		replace: function(value) {
+			return emoji.replace_colons(":" + value + ":") + " ";
+		},
+		index: 1
+	};
+
+	var nicksStrategy = {
+		id: "nicks",
+		match: /(^|\s)(\w{2,})$/,
+		search: function(term, callback) {
+			callback(complete(term));
+		},
+		template: function(value) {
+			return "@" + value;
+		},
+		replace: function(value) {
+			return value;
+		},
+		index: 2
+	};
+
 	function setLocalStorageItem(key, value) {
 		try {
 			window.localStorage.setItem(key, value);
@@ -901,7 +938,9 @@ $(function() {
 
 			$("#chat .chan.active .chat").trigger("msg.sticky"); // fix growing
 		})
-		.tab(complete, {hint: false});
+		.textcomplete([emojiStrategy, nicksStrategy], {
+			placement: "top"
+		});
 
 	var focus = $.noop;
 	if (!("ontouchstart" in window || navigator.maxTouchPoints > 0)) {
