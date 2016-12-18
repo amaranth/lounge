@@ -381,7 +381,6 @@ $(function() {
 			template = "msg_action";
 		} else if (type === "unhandled") {
 			template = "msg_unhandled";
-			data.msg.commandslug = data.msg.command.toLowerCase().replace(/[^a-z0-9]/, "-");
 		} else if (type === "condensed") {
 			template = "msg_condensed";
 		}

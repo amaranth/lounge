@@ -1,4 +1,4 @@
-<div class="msg {{type}}{{#if self}} self{{/if}}{{#if highlight}} highlight{{/if}}" data-time="{{time}}">
+<div class="msg {{type}}{{#if self}} self{{/if}}{{#if highlight}} highlight{{/if}} msg-{{slugify command}}" data-time="{{time}}">
 	<span class="time" title="{{localetime time}}">
 		{{tz time}}
 	</span>
