@@ -623,6 +623,13 @@ $(function() {
 			.find("#chan-" + data.chan)
 			.find(".messages");
 
+		// Set lastSender appropriately
+		var firstSenderOld = chan.children(".message").eq(0).children(".from").eq(0).text().trim();
+		var lastSenderNew = data.messages[data.messages.length - 1].mode + data.messages[data.messages.length - 1].from;
+		if (firstSenderOld === lastSenderNew) {
+			chan.children(".message").eq(0).addClass("equal-from");
+		}
+
 		// Remove the date-change marker we put at the top, because it may
 		// not actually be a date change now
 		var children = $(chan).children();
