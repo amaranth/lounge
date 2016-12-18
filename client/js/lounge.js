@@ -356,7 +356,7 @@ $(function() {
 			.click();
 	});
 
-	function buildChatMessage(data) {
+	function buildChatMessage(data, lastSender) {
 		var type = data.msg.type;
 		var target = "#chan-" + data.chan;
 		if (type === "error") {
@@ -370,6 +370,10 @@ $(function() {
 			return data.msg.text.toLocaleLowerCase().indexOf(h.toLocaleLowerCase()) > -1;
 		})) {
 			data.msg.highlight = true;
+		}
+
+		if (lastSender === data.msg.node + data.msg.from) {
+			data.msg.sameSender = true;
 		}
 
 		if (handledTypes.indexOf(type) !== -1) {
@@ -455,11 +459,16 @@ $(function() {
 	}
 
 	function buildChannelMessages(data) {
+		var lastSender;
+
 		return data.messages.reduce(function(docFragment, message) {
 			appendMessage(docFragment, data.id, data.type, message.type, buildChatMessage({
 				chan: data.id,
 				msg: message
-			}));
+			}, lastSender));
+
+			lastSender = message.mode + message.from;
+
 			return docFragment;
 		}, $(document.createDocumentFragment()));
 	}
@@ -470,8 +479,16 @@ $(function() {
 	}
 
 	function renderChannelMessages(data) {
+		var channel = chat.find("#chan-" + data.id + " .messages");
 		var documentFragment = buildChannelMessages(data);
-		var channel = chat.find("#chan-" + data.id + " .messages").append(documentFragment);
+
+		channel.append(documentFragment);
+
+		if (data.messages.length > 0) {
+			var lastSender = data.messages[data.messages.length - 1];
+			lastSender = lastSender.mode + lastSender.from;
+			channel.data("last-from", lastSender);
+		}
 
 		if (data.firstUnread > 0) {
 			var first = channel.find("#msg-" + data.firstUnread);
@@ -561,9 +578,11 @@ $(function() {
 	}
 
 	socket.on("msg", function(data) {
-		var msg = buildChatMessage(data);
 		var target = "#chan-" + data.chan;
 		var container = chat.find(target + " .messages");
+		var msg = buildChatMessage(data, container.data("last-from"));
+
+		container.data("last-from", data.msg.mode + data.msg.from);
 
         // Check if date changed
 		var prevMsg = $(container.find(".msg")).last();
