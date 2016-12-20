@@ -100,7 +100,9 @@ $(function() {
 	emoji.replace_colons("");  // this is needed to create the colons map
 	var emojies = Object.keys(emoji.map.colons);
 
-	var emojiStrategy = { // emoji strategy
+	// Autocompletion Strategies
+
+	var emojiStrategy = {
 		id: "emoji",
 		match: /\B:([-+\w]*)$/,
 		search: function(term, callback) {
@@ -119,17 +121,56 @@ $(function() {
 
 	var nicksStrategy = {
 		id: "nicks",
-		match: /(^|\s)(\w{2,})$/,
+		match: /\B@([a-zA-Z_[\]\\^{}|`@][a-zA-Z0-9_[\]\\^{}|`-]*)$/,
 		search: function(term, callback) {
-			callback(complete(term));
+			if (term[0] === "@") {
+				callback(completeNicks(term.slice(1)).map(function(val) {
+					return "@" + val;
+				}));
+			} else {
+				callback(completeNicks(term));
+			}
 		},
 		template: function(value) {
+			if (value[0] === "@") {
+				return value;
+			}
 			return "@" + value;
 		},
 		replace: function(value) {
 			return value;
 		},
-		index: 2
+		index: 1
+	};
+
+	var chanStrategy = {
+		id: "chans",
+		match: /\B(#|\+|&|![A-Z0-9]{5})([^\x00\x0A\x0D\x20\x2C\x3A]+(:[^\x00\x0A\x0D\x20\x2C\x3A]*)?)$/,
+		search: function(term, callback, match) {
+			callback(completeChans(match[0]));
+		},
+		template: function(value) {
+			return value;
+		},
+		replace: function(value) {
+			return value;
+		},
+		index: 1
+	};
+
+	var commandStrategy = {
+		id: "commands",
+		match: /^\/(\w*)$/,
+		search: function(term, callback) {
+			callback(completeCommands("/" + term));
+		},
+		template: function(value) {
+			return value;
+		},
+		replace: function(value) {
+			return value + " ";
+		},
+		index: 1
 	};
 
 	function setLocalStorageItem(key, value) {
@@ -938,7 +979,7 @@ $(function() {
 
 			$("#chat .chan.active .chat").trigger("msg.sticky"); // fix growing
 		})
-		.textcomplete([emojiStrategy, nicksStrategy], {
+		.textcomplete([emojiStrategy, nicksStrategy, chanStrategy, commandStrategy], {
 			placement: "top"
 		}).on({
 			"textComplete:show": function() {
@@ -946,6 +987,13 @@ $(function() {
 			},
 			"textComplete:hide": function() {
 				$(this).data("autocompleting", false);
+			}
+		})
+		.on("keydown", function(e) {
+			var keyCode = e.keyCode || e.which;
+
+			if (keyCode === 9) {
+				e.preventDefault();
 			}
 		});
 
@@ -1482,14 +1530,31 @@ $(function() {
 			.find(".messages .msg, .date-marker").remove();
 	}
 
-	function complete(word) {
-		var words = commands.slice();
+	function completeNicks(word) {
 		var users = chat.find(".active").find(".users");
-		var nicks = users.data("nicks");
+		var words = users.data("nicks");
 
-		for (var i in nicks) {
-			words.push(nicks[i]);
-		}
+		return $.grep(
+			words,
+			function(w) {
+				return !w.toLowerCase().indexOf(word.toLowerCase());
+			}
+		);
+	}
+
+	function completeCommands(word) {
+		var words = commands.slice();
+
+		return $.grep(
+			words,
+			function(w) {
+				return !w.toLowerCase().indexOf(word.toLowerCase());
+			}
+		);
+	}
+
+	function completeChans(word) {
+		var words = [];
 
 		sidebar.find(".chan")
 			.each(function() {
