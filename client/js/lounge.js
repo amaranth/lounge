@@ -979,6 +979,7 @@ $(function() {
 
 			$("#chat .chan.active .chat").trigger("msg.sticky"); // fix growing
 		})
+		.tab(completeNicks, {hint: false})
 		.textcomplete([emojiStrategy, nicksStrategy, chanStrategy, commandStrategy], {
 			placement: "top"
 		}).on({
