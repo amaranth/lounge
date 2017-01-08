@@ -6,6 +6,8 @@ import Mousetrap from "mousetrap";
 import URI from "urijs";
 
 // our libraries
+import "jquery-textcomplete"
+import emojiMap from "emoji-name-map";
 import "./libs/jquery/inputhistory";
 import "./libs/jquery/stickyscroll";
 import "./libs/jquery/tabcomplete";
@@ -95,10 +97,7 @@ $(function() {
 
 	var favicon = $("#favicon");
 
-	var emoji = new window.EmojiConvertor();
-	emoji.replace_mode = "unified";
-	emoji.replace_colons("");  // this is needed to create the colons map
-	var emojies = Object.keys(emoji.map.colons);
+	var emojies = Object.keys(emojiMap.colons);
 
 	// Autocompletion Strategies
 
@@ -111,10 +110,10 @@ $(function() {
 			}));
 		},
 		template: function(value) {
-			return emoji.replace_colons(":" + value + ":") + " " + value;
+			return emojiMap.get(value) + " :" + value + ":";
 		},
 		replace: function(value) {
-			return emoji.replace_colons(":" + value + ":") + " ";
+			return emojiMap.get(value);
 		},
 		index: 1
 	};
