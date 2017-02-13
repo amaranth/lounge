@@ -980,6 +980,7 @@ $(function() {
 		})
 		.tab(completeNicks, {hint: false})
 		.textcomplete([emojiStrategy, nicksStrategy, chanStrategy, commandStrategy], {
+			dropdownClassName: "textcomplete-menu",
 			placement: "top"
 		}).on({
 			"textComplete:show": function() {
