@@ -533,8 +533,9 @@ $(function() {
 		if (children.eq(0).hasClass("date-marker")) { // Check top most child
 			children.eq(0).remove();
 		} else if (children.eq(0).hasClass("unread-marker") && children.eq(1).hasClass("date-marker")) {
-			// Otherwise the date-marker would get 'stuck' because of the new-message marker
 			children.eq(1).remove();
+		} else if (children.eq(0).hasClass("condensed") && children.eq(0).children(".date-marker").eq(0).hasClass("date-marker")) {
+			children.eq(0).children(".date-marker").eq(0).remove();
 		}
 
 		// get the scrollable wrapper around messages
@@ -1274,10 +1275,14 @@ $(function() {
 
 	chat.on("click", ".show-more-button", function() {
 		var self = $(this);
-		var count = self.parent().next(".messages").children().length;
+		var lastMessage = self.parent().next(".messages").children(".msg").first();
+		if (lastMessage.is(".condensed")) {
+			lastMessage = lastMessage.children(".msg").first();
+		}
+		var lastMessageId = lastMessage[0].id;
 		socket.emit("more", {
 			target: self.data("id"),
-			count: count
+			lastId: lastMessageId
 		});
 	});
 
