@@ -7,7 +7,7 @@ import URI from "urijs";
 
 // our libraries
 import "jquery-textcomplete"
-import emojiMap from "emoji-name-map";
+import emojilib from "emojilib";
 import "./libs/jquery/inputhistory";
 import "./libs/jquery/stickyscroll";
 import "./libs/jquery/tabcomplete";
@@ -97,7 +97,7 @@ $(function() {
 
 	var favicon = $("#favicon");
 
-	var emojies = Object.keys(emojiMap.colons);
+	var emojies = emojilib.ordered;
 
 	// Autocompletion Strategies
 
@@ -110,10 +110,10 @@ $(function() {
 			}));
 		},
 		template: function(value) {
-			return emojiMap.get(value) + " :" + value + ":";
+			return emojilib.lib[value].char + " :" + value + ":";
 		},
 		replace: function(value) {
-			return emojiMap.get(value);
+			return emojilib.lib[value].char;
 		},
 		index: 1
 	};
