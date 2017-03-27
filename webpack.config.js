@@ -54,7 +54,8 @@ let config = {
 					loader: "handlebars-loader",
 					options: {
 						helperDirs: [
-							path.resolve(__dirname, "client/js/libs/handlebars")
+							path.resolve(__dirname, "client/js/libs/handlebars"),
+							path.resolve(__dirname, "node_modules/handlebars-helper-slugify")
 						],
 						extensions: [
 							".tpl"

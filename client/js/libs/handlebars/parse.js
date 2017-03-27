@@ -1,5 +1,3 @@
-"use strict";
-
 const Handlebars = require("handlebars/runtime");
 const URI = require("urijs");
 const parseStyle = require("./ircmessageparser/parseStyle");

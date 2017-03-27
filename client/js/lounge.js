@@ -6,7 +6,7 @@ import Mousetrap from "mousetrap";
 import URI from "urijs";
 
 // our libraries
-import "jquery-textcomplete"
+import "jquery-textcomplete";
 import emojilib from "emojilib";
 import "./libs/jquery/inputhistory";
 import "./libs/jquery/stickyscroll";
